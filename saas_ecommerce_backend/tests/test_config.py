@@ -35,7 +35,12 @@ def build_settings(**overrides: Any) -> Settings:
         "CORS_ORIGINS",
     ],
 )
-def test_required_settings_cannot_be_missing(missing_setting: str) -> None:
+def test_required_settings_cannot_be_missing(
+    missing_setting: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    for setting in VALID_SETTINGS:
+        monkeypatch.delenv(setting, raising=False)
+
     values = VALID_SETTINGS.copy()
     values.pop(missing_setting)
 
