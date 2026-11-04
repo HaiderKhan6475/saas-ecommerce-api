@@ -71,6 +71,8 @@ def test_development_accepts_local_placeholder_and_masks_secret() -> None:
         {"DATABASE_URL": "not-a-database-url"},
         {"JWT_ALGORITHM": "none"},
         {"ACCESS_TOKEN_EXPIRE_MINUTES": 0},
+        {"REQUEST_TIMEOUT_SECONDS": 0},
+        {"REQUEST_TIMEOUT_SECONDS": 301},
         {"LOGIN_RATE_LIMIT_PER_WINDOW": 0},
         {"LOGIN_RATE_LIMIT_WINDOW_SECONDS": 0},
         {"REGISTRATION_RATE_LIMIT_PER_WINDOW": 0},

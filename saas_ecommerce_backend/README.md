@@ -216,6 +216,42 @@ an explicit source allowlist rather than archiving the working directory.
 Git-generated source archives also exclude sensitive/local files through
 `.gitattributes`; `.env.example` remains available as a safe template.
 
+## Operations and observability
+
+`GET /health/live` is a lightweight process liveness probe. `GET /health/ready`
+executes `SELECT 1` using the configured SQLite database and returns `503` with
+`{"status":"not_ready"}` when the database is unavailable. Neither endpoint
+returns configuration, credentials, or exception details.
+
+Each HTTP response includes an `X-Request-ID`. A syntactically valid UUID
+provided in that request header is retained; otherwise the application creates
+one. The header is exposed to browser clients through CORS. Application logs
+are newline-delimited JSON written to standard error. They include the request
+ID, HTTP method, route template, status, duration, and safe exception type
+where applicable. Request/response bodies, query strings, authorization
+headers, tokens, passwords, database URLs, and exception messages are not
+logged. Raw Uvicorn access logging is disabled so query strings are not emitted
+by its default request-line logger. Validation failures retain status `422` and
+return a generic detail rather than echoing potentially sensitive submitted
+values; unexpected errors return a generic `500` response. Existing HTTP status
+codes and static business error details are retained.
+
+`REQUEST_TIMEOUT_SECONDS` configures the application request deadline (default
+`30`, allowed range greater than zero through `300`). A timed-out request
+returns `504` if its response has not started, and cancellation unwinds normal
+async dependencies so database sessions can close. This is an application
+deadline, not a substitute for reverse-proxy, load-balancer, or server
+connection timeouts. Configure infrastructure deadlines consistently and do not
+use this middleware for long-lived streaming requests.
+
+Collect the JSON application logs with the deployment platform's standard log
+collector. Alert on sustained `5xx` rates, repeated `504` timeouts, readiness
+failures, and elevated request durations; group incidents by request ID when
+investigating an individual request. Request status and duration are available
+in the structured request log events for downstream aggregation. No external
+monitoring provider, metrics endpoint, dashboard, or alerting integration is
+configured by this project.
+
 ## Verification
 
 From this directory, run the complete test suite:
