@@ -14,7 +14,7 @@ concurrency:
 jobs:
   quality-and-tests:
     name: Python ${{ matrix.python-version }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -63,7 +63,7 @@ jobs:
     name: Required CI gate
     if: always()
     needs: quality-and-tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Require every quality and test matrix job to pass
         run: test "${{ needs.quality-and-tests.result }}" = "success"
