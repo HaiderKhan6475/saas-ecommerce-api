@@ -1,0 +1,22 @@
+# Keep secrets and local data out of git-generated source archives.
+**/.env export-ignore
+**/.env.* export-ignore
+**/.env.example !export-ignore
+**/*.env export-ignore
+**/credentials export-ignore
+**/credentials.* export-ignore
+**/*_credentials.* export-ignore
+**/secrets.* export-ignore
+**/*.pem export-ignore
+**/*.key export-ignore
+**/*.p12 export-ignore
+**/*.pfx export-ignore
+**/*.der export-ignore
+**/*.db export-ignore
+**/*.db-* export-ignore
+**/*.sqlite export-ignore
+**/*.sqlite3 export-ignore
+**/*.sqlite-* export-ignore
+**/.venv/** export-ignore
+**/venv/** export-ignore
+**/env/** export-ignore

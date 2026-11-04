@@ -1,0 +1,69 @@
+name: Backend CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-and-tests:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    defaults:
+      run:
+        working-directory: saas_ecommerce_backend
+    env:
+      APP_NAME: CI Test API
+      ENVIRONMENT: test
+      DATABASE_URL: sqlite+aiosqlite:///./ci-unused.db
+      SECRET_KEY: ci-only-not-a-production-secret
+      JWT_ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+      CORS_ORIGINS: '["http://localhost"]'
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: saas_ecommerce_backend/requirements-dev.lock
+      - name: Install locked dependencies
+        run: python -m pip install -r requirements-dev.lock
+      - name: Check Ruff lint
+        run: ruff check app migrations tests
+      - name: Check Ruff formatting
+        run: ruff format --check app migrations tests
+      - name: Check types
+        run: mypy
+      - name: Audit locked dependencies
+        run: pip-audit -r requirements-dev.lock
+      - name: Run tests with coverage
+        run: python -m pytest -q --cov --cov-report=term-missing
+      - name: Validate migrations against a disposable SQLite database
+        shell: bash
+        run: |
+          python -c "import sqlite3; assert sqlite3.sqlite_version_info >= (3, 35, 0), sqlite3.sqlite_version"
+          migration_dir="$(mktemp -d)"
+          export DATABASE_URL="sqlite+aiosqlite:////${migration_dir#/}/migrations.sqlite3"
+          python -m alembic upgrade head
+          python -m alembic check
+
+  ci-gate:
+    name: Required CI gate
+    if: always()
+    needs: quality-and-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every quality and test matrix job to pass
+        run: test "${{ needs.quality-and-tests.result }}" = "success"

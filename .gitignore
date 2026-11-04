@@ -1,0 +1,54 @@
+# Environment configuration and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+*.env
+!*.env.example
+**/*.env
+!**/.env.example
+**/credentials
+**/credentials.*
+**/*_credentials.*
+**/secrets.*
+
+# Private keys and certificates that may contain private key material
+*.pem
+*.key
+*.p12
+*.pfx
+*.der
+id_rsa*
+id_ed25519*
+
+# Local databases and SQLite sidecar files
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite-*
+
+# Python environments and generated files
+**/.venv/
+**/venv/
+**/env/
+**/__pycache__/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.coverage
+**/htmlcov/
+*.py[cod]
+
+# Build and distribution output
+**/build/
+**/dist/
+**/*.egg-info/
+# Editor settings (optional)
+.vscode/
+
+# SQLite sidecar files
+*.db-shm
+*.db-wal

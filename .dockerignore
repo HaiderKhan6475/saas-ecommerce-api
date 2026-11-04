@@ -1,0 +1,30 @@
+# Never send local secrets, credentials, or key material to the build context.
+**/.env
+**/.env.*
+**/*.env
+**/credentials
+**/credentials.*
+**/*_credentials.*
+**/secrets.*
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/*.der
+**/id_rsa*
+**/id_ed25519*
+
+# Local databases and SQLite sidecar files.
+**/*.db
+**/*.db-*
+**/*.sqlite
+**/*.sqlite3
+**/*.sqlite-*
+
+# Local environments, caches, and VCS metadata.
+**/.venv/
+**/venv/
+**/env/
+**/__pycache__/
+**/.pytest_cache/
+**/.git/
