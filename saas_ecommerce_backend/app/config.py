@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     CORS_ORIGINS: list[str]
+    REQUEST_TIMEOUT_SECONDS: float = Field(default=30.0, gt=0, le=300)
     LOGIN_RATE_LIMIT_PER_WINDOW: int = Field(default=10, gt=0)
     LOGIN_RATE_LIMIT_WINDOW_SECONDS: int = Field(default=900, gt=0)
     REGISTRATION_RATE_LIMIT_PER_WINDOW: int = Field(default=5, gt=0)

@@ -19,7 +19,8 @@ from sqlalchemy.pool import NullPool
 from app import deps, models
 from app.config import Settings
 from app.database import Base, create_database_engine, get_db
-from app.routers import auth, products, tenants
+from app.observability import install_operational_handling
+from app.routers import auth, health, products, tenants
 
 TEST_SECRET_KEY = "test-only-secret-key-not-for-deployment-123456"
 TEST_PASSWORD = "Test-password-123!"
@@ -82,6 +83,11 @@ def client(
     test_app.include_router(auth.router)
     test_app.include_router(tenants.router)
     test_app.include_router(products.router)
+    test_app.include_router(health.router)
+    install_operational_handling(
+        test_app,
+        request_timeout_seconds=test_settings.REQUEST_TIMEOUT_SECONDS,
+    )
     monkeypatch.setattr(deps, "settings", test_settings)
 
     async def get_test_db() -> AsyncGenerator[AsyncSession, None]:
